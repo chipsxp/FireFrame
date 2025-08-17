@@ -18,7 +18,7 @@ import { ChevronDown } from "lucide-react";
 import {
   getSuggestedUsers,
   SuggestedUser,
-} from "@/ai/flows/get-suggested-users-flow";
+} from "@/app/ai/flows/get-suggested-users-flow";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Post } from "@/lib/types";

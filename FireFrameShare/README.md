@@ -44,7 +44,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
   - Form components (Input, Textarea, Button)
   - Navigation components (Accordion, Collapsible)
 - **Lucide React**: Beautiful, customizable icons
-- **shadcn/ui**: Pre-built component library built on Radix UI
+- **Shadcn UI**: Pre-built component library built on Radix UI
 
 ### State Management
 - **Zustand**: Lightweight state management for user authentication and posts

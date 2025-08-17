@@ -19,12 +19,12 @@ import NewPostDialog from './new-post-dialog';
 import React from 'react';
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [isNewPostOpen, setIsNewPostOpen] = React.useState(false);
 
   const handleLogout = () => {
-    logout();
+    signOut();
     router.push('/login');
   };
   

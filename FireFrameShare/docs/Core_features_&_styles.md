@@ -2,7 +2,7 @@
 
 ## Core Features:
 
-- Authentication: User authentication via Firebase, including login, logout, and signup, integrated with React Firebase Hooks.
+- Authentication: User authentication via Supabase, including login, logout, and signup, integrated with React Supabase Hooks.
 - Routing and Navigation: Protected routes for the home page and public routes for authentication and profile pages using React Router.
 - UI Components: Use Chakra UI components for a consistent and responsive user interface.
 - State Management: Zustand for user state management and localStorage for persistence.

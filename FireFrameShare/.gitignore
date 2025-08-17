@@ -40,8 +40,7 @@ next-env.d.ts
 .genkit/*
 .env*
 package-lock.json
-gemini.md
-ai
+.gemini
 
 # firebase (legacy - will be removed after migration)
 firebase-debug.log
