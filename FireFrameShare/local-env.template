@@ -12,7 +12,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # Gemini LLM key for Gemini CLI
-GEMINI_API_KEY=AIzaSyBaMIw5uzeYdAzX1UGVuRZHcOFte3pjdLU
+GEMINI_API_KEY=YOUR_GEMINI_KEY
 
 # Optional: If you're using Supabase local development
 # NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
