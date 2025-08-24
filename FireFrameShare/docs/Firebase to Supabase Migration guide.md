@@ -1,27 +1,34 @@
-Firebase to Supabase Migration Guide
-📁 File Structure Mapping
-Files to Replace/Create
-Firebase File Supabase Replacement Action
-src/lib/firebase.ts src/lib/supabase.ts Replace
-src/lib/firebase-posts.ts src/lib/supabase-posts.ts Replace
-src/lib/firebase-debug.ts src/lib/supabase-debug.ts Replace
-Files to Update (Import Changes)
-File Current Import New Import Changes Required
-src/hooks/use-post-store.ts from "@/lib/firebase-posts" from "@/lib/supabase-posts" Update imports
-src/app/page.tsx from "@/lib/firebase-debug" from "@/lib/supabase-debug" Update imports
-src/app/profile/[username]/page.tsx from "@/lib/firebase-posts" from "@/lib/supabase-posts" Update imports
-src/components/new-post-dialog.tsx Uses addPost from store No direct changes Already uses store
-Files to Remove
-File Reason
-.firebaserc Firebase project configuration
-apphosting.yaml Firebase hosting configuration
-.idx/dev.nix (Firebase sections) Remove Firebase emulator config
-Files to Update (Configuration)
-File Changes
-package.json Remove firebase, add @supabase/supabase-js
-.gitignore Remove Firebase logs, add Supabase logs
-next.config.ts Add Supabase domain to image remotePatterns
-🗄️ Complete Supabase Schema Configuration
+
+# Firebase to Supabase Migration Guide
+
+## 📁 File Structure Mapping
+
+* Files to Replace/Create
+* Firebase File Supabase Replacement Action
+* src/lib/firebase.ts src/lib/supabase.ts Replace
+* src/lib/firebase-posts.ts src/lib/supabase-posts.ts Replace
+* src/lib/firebase-debug.ts src/lib/supabase-debug.ts Replace
+* Files to Update (Import Changes)
+* File Current Import New Import Changes Required
+* src/hooks/use-post-store.ts from "@/lib/firebase-posts" from "@/lib/supabase-posts" Update imports
+* src/app/page.tsx from "@/lib/firebase-debug" from "@/lib/supabase-debug" Update imports
+* src/app/profile/[username]/page.tsx from "@/lib/firebase-posts" from "@/lib/supabase-posts" Update imports
+* src/components/new-post-dialog.tsx Uses addPost from store No direct changes Already uses store
+* Files to Remove
+* File Reason
+
+1. Remove file after configuration to Supabase: .firebaserc Firebase project configuration
+2. Remove file after configuration to Supabase: apphosting.yaml Firebase hosting configuration
+3. Remove file after configuration to Supabase: .idx/dev.nix (Firebase sections) Remove Firebase emulator config
+
+** Files to Update (Configuration)
+  -- File Changes
+
+1. package.json Remove firebase, add @supabase/supabase-js
+2. .gitignore Remove Firebase logs, add Supabase logs
+3. next.config.ts Add Supabase domain to image remotePatterns
+
+## 🗄️ Complete Supabase Schema Configuration
 
 1. Database Schema (SQL)
 

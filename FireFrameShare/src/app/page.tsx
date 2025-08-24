@@ -49,18 +49,10 @@ export default function Home() {
   const { posts, initializePosts, isLoading: postsLoading } = usePostStore();
 
   useEffect(() => {
-    // Initialize Firebase debugging and posts when component mounts
-    const initializeApp = async () => {
-      if (isAuthenticated) {
-        // Test Supabase connection first
-        await initSupabaseDebug();
-
-        // Then initialize posts
-        initializePosts();
-      }
-    };
-
-    initializeApp();
+    if (isAuthenticated) {
+      const unsubscribe = initializePosts();
+      return () => unsubscribe();
+    }
   }, [isAuthenticated, initializePosts]);
 
   useEffect(() => {
@@ -113,10 +105,11 @@ export default function Home() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              {displayedPosts.map((post) => (
+              {displayedPosts.map((post, index) => (
                 <PostCard
                   key={post.id}
                   post={post}
+                  priority={index === 0}
                   data-ai-hint="social media post"
                 />
               ))}

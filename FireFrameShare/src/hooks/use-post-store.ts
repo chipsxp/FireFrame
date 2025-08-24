@@ -6,7 +6,7 @@ import {
   addPost as supabaseAddPost,
   updatePost as supabaseUpdatePost,
   subscribeToAllPosts,
-  getAllPosts,
+  convertSupabaseToPost,
 } from "@/lib/supabase-posts";
 
 interface PostState {
@@ -18,7 +18,7 @@ interface PostState {
   setPosts: (posts: Post[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  initializePosts: () => Promise<void>;
+  initializePosts: () => () => void; // Return unsubscribe function
 }
 
 export const usePostStore = create<PostState>((set, get) => ({
@@ -29,9 +29,8 @@ export const usePostStore = create<PostState>((set, get) => ({
   addPost: async (post) => {
     try {
       set({ isLoading: true, error: null });
-      const postId = await supabaseAddPost(post);
-      // The real-time listener will update the posts automatically
-      console.log("Post added successfully with ID:", postId);
+      await supabaseAddPost(post);
+      // Real-time listener will handle the update
     } catch (error) {
       console.error("Error adding post:", error);
       set({ error: "Failed to add post" });
@@ -44,8 +43,7 @@ export const usePostStore = create<PostState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       await supabaseUpdatePost(updatedPost);
-      // The real-time listener will update the posts automatically
-      console.log("Post updated successfully");
+      // Real-time listener will handle the update
     } catch (error) {
       console.error("Error updating post:", error);
       set({ error: "Failed to update post" });
@@ -58,28 +56,45 @@ export const usePostStore = create<PostState>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
 
-  initializePosts: async () => {
-    try {
-      set({ isLoading: true, error: null });
+  initializePosts: () => {
+    set({ isLoading: true, error: null });
 
-      // Set up real-time listener
-      const unsubscribe = subscribeToAllPosts((posts) => {
-        set({ posts, isLoading: false });
-      });
-
-      // Store unsubscribe function for cleanup
-      (get() as any).unsubscribe = unsubscribe;
-    } catch (error) {
-      console.error("Error initializing posts:", error);
-      set({ error: "Failed to load posts", isLoading: false });
-
-      // Fallback to one-time fetch
-      try {
-        const posts = await getAllPosts();
-        set({ posts });
-      } catch (fallbackError) {
-        console.error("Fallback fetch also failed:", fallbackError);
+    const handleRealtimeUpdate = (payload: any) => {
+      if (payload.type === "INITIAL_LOAD") {
+        set({ posts: payload.posts, isLoading: false });
+        return;
       }
-    }
+
+      if (payload.type === "REALTIME_UPDATE") {
+        const { eventType, new: newRecord, old: oldRecord } = payload.payload;
+        const currentPosts = get().posts;
+
+        switch (eventType) {
+          case "INSERT":
+            set({ posts: [convertSupabaseToPost(newRecord), ...currentPosts] });
+            break;
+          case "UPDATE":
+            set({
+              posts: currentPosts.map((post) =>
+                post.id === newRecord.id
+                  ? convertSupabaseToPost(newRecord)
+                  : post
+              ),
+            });
+            break;
+          case "DELETE":
+            set({
+              posts: currentPosts.filter((post) => post.id !== oldRecord.id),
+            });
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    const unsubscribe = subscribeToAllPosts(handleRealtimeUpdate);
+
+    return unsubscribe;
   },
 }));

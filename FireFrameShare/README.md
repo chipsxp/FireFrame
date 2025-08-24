@@ -5,6 +5,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 ## 🚀 Features
 
 ### Authentication & User Management
+
 - **Email/Password Authentication**: Secure signup and signin with email validation
 - **OAuth Integration**: Multiple OAuth providers supported:
   - Google
@@ -16,6 +17,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 - **Real-time Session Management**: Automatic session handling and persistence
 
 ### Social Media Functionality
+
 - **Post Creation**: Upload images with captions and share with the community
 - **Real-time Feed**: Live updates of posts from all users
 - **User Profiles**: View individual user profiles with their post history
@@ -24,6 +26,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 - **Responsive Design**: Optimized for desktop and mobile devices
 
 ### User Interface
+
 - **Modern Design**: Clean, Instagram-inspired interface
 - **Dark/Light Mode**: Automatic theme detection and switching
 - **Responsive Layout**: Mobile-first design that works on all devices
@@ -33,11 +36,13 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 ## 🛠️ Tech Stack
 
 ### Frontend Framework
+
 - **Next.js 15.3.3**: React framework with App Router
 - **React 18**: Latest React with concurrent features
 - **TypeScript**: Full type safety throughout the application
 
 ### UI & Styling
+
 - **Tailwind CSS**: Utility-first CSS framework
 - **Radix UI**: Accessible, unstyled UI components:
   - Dialog, Dropdown Menu, Avatar, Tabs
@@ -47,11 +52,13 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 - **Shadcn UI**: Pre-built component library built on Radix UI
 
 ### State Management
+
 - **Zustand**: Lightweight state management for user authentication and posts
 - **React Hook Form**: Efficient form handling with validation
 - **Zod**: Schema validation for forms and data
 
 ### Backend & Database
+
 - **Supabase**: Backend-as-a-Service providing:
   - PostgreSQL database
   - Real-time subscriptions
@@ -60,6 +67,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
   - Row Level Security (RLS)
 
 ### Development Tools
+
 - **TypeScript**: Static type checking
 - **ESLint**: Code linting and formatting
 - **Turbopack**: Fast development server (Next.js)
@@ -69,6 +77,7 @@ A modern social media platform built with Next.js and Supabase, featuring real-t
 FireFrame uses Supabase Auth for comprehensive user authentication:
 
 ### Signup Process
+
 - **Form Validation**: Comprehensive form validation with Zod schema
 - **Password Strength**: Real-time password strength indicator
 - **Email Verification**: Email confirmation required for account activation
@@ -76,6 +85,7 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 - **Terms & Privacy**: Required acceptance of terms and privacy policy
 
 ### Signin Options
+
 - **Email/Password**: Traditional authentication method
 - **OAuth Providers**: One-click signin with:
   - Google OAuth
@@ -86,6 +96,7 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 - **Secure Redirects**: Safe callback handling for OAuth flows
 
 ### Security Features
+
 - **Row Level Security**: Database-level security policies
 - **JWT Tokens**: Secure token-based authentication
 - **Automatic Token Refresh**: Seamless session management
@@ -94,21 +105,25 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 ## 🗄️ Supabase Integration
 
 ### Database Schema
+
 - **Users Table**: User profiles with metadata
 - **Posts Table**: Social media posts with relationships
 - **Real-time Subscriptions**: Live updates for posts and user data
 
 ### Storage
+
 - **Image Upload**: Secure image storage with automatic optimization
 - **CDN Integration**: Fast image delivery through Supabase CDN
 - **File Management**: Organized storage buckets for different content types
 
 ### Real-time Features
+
 - **Live Posts**: Real-time post updates across all users
 - **User Status**: Live user presence and activity
 - **Instant Notifications**: Real-time feedback for user interactions
 
 ### Security & Performance
+
 - **Row Level Security (RLS)**: User data isolation and security
 - **Connection Pooling**: Optimized database connections
 - **Automatic Backups**: Built-in data protection
@@ -117,6 +132,7 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or yarn
 - Supabase account
@@ -124,29 +140,54 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 ### Installation
 
 1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
+
+   ```bash   git clone <repository-url>
+
    cd FireFrame
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment Setup**
+
    ```bash
    cp .env.local.template .env.local
    ```
 
-   Fill in your Supabase credentials:
+   Fill in your Supabase credentials and other environment variables:
+
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   # ------------------------------------------------------------------
+   # SUPABASE REQUIRED VARS
+   # ------------------------------------------------------------------
+   # Find these in your Supabase project dashboard under Settings > API
+   # ------------------------------------------------------------------
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+   # ------------------------------------------------------------------
+   # GEMINI (OPTIONAL)
+   # ------------------------------------------------------------------
+   # Key for features using the Gemini API (e.g., Gemini CLI)
+   # ------------------------------------------------------------------
+   GEMINI_API_KEY=your_gemini_api_key
+
+   # ------------------------------------------------------------------
+   # FIREBASE (LEGACY - for reference during migration)
+   # ------------------------------------------------------------------
+   # These are no longer required for the application to run
+   # ------------------------------------------------------------------
+   # NEXT_PUBLIC_FIREBASE_PROJECT_ID=fireframe-cfl39
+   # NEXT_PUBLIC_USE_FIREBASE_EMULATORS=false
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -166,6 +207,7 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 ## 📱 Usage
 
 ### Creating an Account
+
 1. Click "Sign Up" on the homepage
 2. Fill in your details (username, email, password)
 3. Accept terms and privacy policy
@@ -173,12 +215,14 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 5. Complete your profile setup
 
 ### Posting Content
+
 1. Click the "+" button in the header
 2. Upload an image or take a photo
 3. Add a caption
 4. Click "Share" to publish
 
 ### Exploring Content
+
 1. Browse the main feed for trending posts
 2. Use filters to sort content
 3. Visit user profiles to see their posts
@@ -187,7 +231,8 @@ FireFrame uses Supabase Auth for comprehensive user authentication:
 ## 🔧 Development
 
 ### Project Structure
-```
+
+```tree
 FireFrameShare/
 ├── src/
 │   ├── app/                 # Next.js App Router pages
@@ -200,6 +245,7 @@ FireFrameShare/
 ```
 
 ### Key Components
+
 - **AuthProvider**: Global authentication context
 - **ProtectedRoute**: Route protection wrapper
 - **PostCard**: Individual post display component
@@ -207,6 +253,7 @@ FireFrameShare/
 - **Header**: Navigation and search
 
 ### Custom Hooks
+
 - **useAuth**: Authentication state management
 - **usePostStore**: Post data management
 - **Form hooks**: Form validation and submission
@@ -226,6 +273,7 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For support and questions:
+
 - Check the documentation in the `/docs` folder
 - Review the Supabase setup instructions
 - Open an issue on GitHub

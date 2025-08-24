@@ -243,6 +243,8 @@ export default function NewPostDialog({
                   </Button>
                 </div>
                 <Input
+                  id="post-image-upload"
+                  name="post-image-upload"
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
@@ -257,9 +259,9 @@ export default function NewPostDialog({
                 <Image
                   src={image}
                   alt="Selected preview"
-                  layout="fill"
-                  objectFit="contain"
-                  className="rounded-md"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="rounded-md object-contain"
                 />
                 <Button
                   variant="destructive"
@@ -327,6 +329,7 @@ export default function NewPostDialog({
               </Label>
               <Textarea
                 id="caption"
+                autoComplete="off"
                 placeholder="Write a caption..."
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}

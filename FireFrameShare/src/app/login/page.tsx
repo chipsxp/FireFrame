@@ -42,6 +42,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+  const [localLoading, setLocalLoading] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -75,22 +76,28 @@ export default function LoginPage() {
   }, [searchParams, toast]);
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    const { error } = await signIn(values.email, values.password);
+    setLocalLoading(true);
 
-    if (error) {
+    try {
+      const { error } = await signIn(values.email, values.password);
+
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        title: "Login Failed",
-        description: error.message,
-        variant: "destructive",
+        title: "Login Successful",
+        description: "Welcome back!",
       });
-      return;
+      router.push("/");
+    } finally {
+      setLocalLoading(false);
     }
-
-    toast({
-      title: "Login Successful",
-      description: "Welcome back!",
-    });
-    router.push("/");
   };
 
   const handleOAuthLogin = async (
@@ -134,6 +141,8 @@ export default function LoginPage() {
                       <FormControl>
                         <Input
                           id="email"
+                          type="email"
+                          autoComplete="email"
                           placeholder="name@example.com"
                           {...field}
                         />
@@ -153,6 +162,7 @@ export default function LoginPage() {
                           <Input
                             id="password"
                             type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
                             placeholder="••••••••"
                             {...field}
                           />
@@ -196,9 +206,9 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full font-bold"
-                  disabled={isLoading}
+                  disabled={localLoading || isLoading}
                 >
-                  {isLoading ? "Signing In..." : "Sign In"}
+                  {localLoading || isLoading ? "Signing In..." : "Sign In"}
                 </Button>
 
                 <div className="relative">

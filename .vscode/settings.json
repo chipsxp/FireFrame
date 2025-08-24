@@ -1,0 +1,9 @@
+{
+  "geminicodeassist.codeGenerationPaneViewEnabled": true,
+  "geminicodeassist.updateChannel": "Default",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "notebook.defaultFormatter": "esbenp.prettier-vscode",
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
+}

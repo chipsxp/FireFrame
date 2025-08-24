@@ -157,6 +157,8 @@ export default function SignupPage() {
                       <FormControl>
                         <Input
                           id="username"
+                          type="text"
+                          autoComplete="username"
                           placeholder="your_username"
                           {...field}
                         />
@@ -174,6 +176,8 @@ export default function SignupPage() {
                       <FormControl>
                         <Input
                           id="email"
+                          type="email"
+                          autoComplete="email"
                           placeholder="name@example.com"
                           {...field}
                         />

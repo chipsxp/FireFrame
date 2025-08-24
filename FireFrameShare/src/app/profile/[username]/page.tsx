@@ -133,6 +133,126 @@ export default function ProfilePage({
     setFilteredPosts(result);
   }, [titleFilter, dateFilter, userPosts]);
 
+  const isOwnProfile = user?.username === params.username;
+
+  // Load profile data - MOVED BEFORE EARLY RETURN TO FIX HOOKS ERROR
+  useEffect(() => {
+    const loadProfile = async () => {
+      // If this is the user's own profile and we have user data
+      if (isOwnProfile && user) {
+        // Only update if we don't already have the profile data or if the user data changed
+        if (!profileUser || profileUser.id !== user.id) {
+          console.log("👤 Loading own profile:", user);
+          setProfileUser(user);
+        }
+        setProfileLoading(false);
+        return;
+      }
+
+      // Don't clear profileUser if we're waiting for user data to load
+      if (isOwnProfile && !user && isLoading) {
+        console.log("⏳ Waiting for user data to load...");
+        return;
+      }
+
+      // If this is someone else's profile, load from database
+      if (!isOwnProfile) {
+        // Only load if we don't already have the profile data for this username
+        if (!profileUser || profileUser.username !== params.username) {
+          setProfileLoading(true);
+          try {
+            const { data, error } = await supabase
+              .from("users")
+              .select("*")
+              .eq("username", params.username)
+              .single();
+
+            if (error) {
+              console.error("Error loading profile:", error);
+              // Create a fallback profile
+              setProfileUser({
+                id: "unknown",
+                username: params.username,
+                email: "user@example.com",
+                avatarUrl: "https://placehold.co/150x150.png",
+                bio: `This is the profile of ${params.username}.`,
+                contacts: {
+                  website: { value: "", isPublic: false },
+                  phone: { value: "", isPublic: false },
+                  messaging: { platform: "", username: "", isPublic: false },
+                },
+              });
+            } else {
+              setProfileUser({
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                avatarUrl: data.avatar_url,
+                bio: data.bio,
+                contacts: {
+                  website: {
+                    value: data.website_url || "",
+                    isPublic: data.website_public || false,
+                  },
+                  phone: {
+                    value: data.phone || "",
+                    isPublic: data.phone_public || false,
+                  },
+                  messaging: {
+                    platform: data.messaging_platform || "",
+                    username: data.messaging_username || "",
+                    isPublic: data.messaging_public || false,
+                  },
+                },
+              });
+            }
+          } catch (error) {
+            console.error("Error loading profile:", error);
+          } finally {
+            setProfileLoading(false);
+          }
+        }
+      }
+    };
+
+    // Only load profile when we have the necessary data
+    if (!isLoading && (user || !isOwnProfile)) {
+      console.log(
+        "🔄 Loading profile - isOwnProfile:",
+        isOwnProfile,
+        "user:",
+        !!user,
+        "isLoading:",
+        isLoading
+      );
+      loadProfile();
+    } else {
+      console.log(
+        "⏸️ Skipping profile load - isOwnProfile:",
+        isOwnProfile,
+        "user:",
+        !!user,
+        "isLoading:",
+        isLoading
+      );
+    }
+  }, [user, params.username, isOwnProfile, isLoading]);
+
+  // Debug useEffect to track profileUser changes
+  useEffect(() => {
+    console.log(
+      "🔍 ProfileUser state changed:",
+      profileUser ? "has data" : "null/undefined"
+    );
+    if (profileUser) {
+      console.log("📊 ProfileUser data:", {
+        username: profileUser.username,
+        avatarUrl: !!profileUser.avatarUrl,
+        bio: !!profileUser.bio,
+      });
+    }
+  }, [profileUser]);
+
   const handleEditClick = (post: Post) => {
     if (user?.username === params.username) {
       setSelectedPost(post);
@@ -173,15 +293,31 @@ export default function ProfilePage({
 
   const handleProfileChangesSave = async () => {
     try {
+      console.log("🔄 Saving profile changes:", editedProfile);
+
+      // Store current profileUser before update to prevent loss
+      const currentProfileUser = profileUser;
+
       const { error } = await updateProfile(editedProfile);
       if (error) {
-        console.error("Error updating profile:", error);
+        console.error("❌ Error updating profile:", error);
         // You could show an error toast here
         return;
       }
+
+      console.log("✅ Profile updated successfully");
+
+      // Update the local profileUser state immediately after successful update
+      // Use currentProfileUser as base to ensure we don't lose data
+      if (isOwnProfile && currentProfileUser) {
+        const updatedProfile = { ...currentProfileUser, ...editedProfile };
+        console.log("🔄 Updating local profileUser state:", updatedProfile);
+        setProfileUser(updatedProfile);
+      }
+
       setIsEditProfileDialogOpen(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("❌ Exception updating profile:", error);
     }
   };
 
@@ -207,14 +343,7 @@ export default function ProfilePage({
     }));
   };
 
-  const isOwnProfile = user?.username === params.username;
-
-  if (
-    isLoading ||
-    !isAuthenticated ||
-    profileLoading ||
-    (!user && isOwnProfile)
-  ) {
+  if (isLoading || !isAuthenticated || profileLoading) {
     return (
       <div className="flex flex-col h-screen w-full bg-background">
         <header className="flex items-center justify-between p-4 border-b">
@@ -251,79 +380,17 @@ export default function ProfilePage({
     { label: "following", value: "342" },
   ];
 
-  // Load profile data
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (isOwnProfile && user) {
-        setProfileUser(user);
-        return;
-      }
-
-      // Load other user's profile from database
-      setProfileLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("username", params.username)
-          .single();
-
-        if (error) {
-          console.error("Error loading profile:", error);
-          // Create a fallback profile
-          setProfileUser({
-            id: "unknown",
-            username: params.username,
-            email: "user@example.com",
-            avatarUrl: "https://placehold.co/150x150.png",
-            bio: `This is the profile of ${params.username}.`,
-            contacts: {
-              website: { value: "", isPublic: false },
-              phone: { value: "", isPublic: false },
-              messaging: { platform: "", username: "", isPublic: false },
-            },
-          });
-        } else {
-          setProfileUser({
-            id: data.id,
-            username: data.username,
-            email: data.email,
-            avatarUrl: data.avatar_url,
-            bio: data.bio,
-            contacts: {
-              website: {
-                value: data.website_url || "",
-                isPublic: data.website_public || false,
-              },
-              phone: {
-                value: data.phone || "",
-                isPublic: data.phone_public || false,
-              },
-              messaging: {
-                platform: data.messaging_platform || "",
-                username: data.messaging_username || "",
-                isPublic: data.messaging_public || false,
-              },
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      } finally {
-        setProfileLoading(false);
-      }
-    };
-
-    if (user !== null || !isOwnProfile) {
-      loadProfile();
-    }
-  }, [user, params.username, isOwnProfile]);
-
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
         <main className="flex-1 w-full max-w-4xl mx-auto py-8 px-4">
+          {(() => {
+            if (!profileUser) {
+              console.log("⚠️ ProfileUser is null/undefined, showing skeleton");
+            }
+            return null;
+          })()}
           {!profileUser ? (
             // Show loading skeleton if profileUser is not loaded yet
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 mb-12">
@@ -435,19 +502,39 @@ export default function ProfilePage({
                 <TabsContent value="posts">
                   {isOwnProfile && (
                     <div className="flex items-center gap-4 my-4 p-4 border rounded-lg bg-card">
-                      <Input
-                        type="text"
-                        placeholder="Filter by caption..."
-                        className="max-w-sm"
-                        value={titleFilter}
-                        onChange={(e) => setTitleFilter(e.target.value)}
-                      />
-                      <Input
-                        type="date"
-                        className="max-w-sm"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                      />
+                      <div className="flex flex-col gap-1">
+                        <Label
+                          htmlFor="caption-filter"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Filter by caption
+                        </Label>
+                        <Input
+                          id="caption-filter"
+                          name="caption-filter"
+                          type="text"
+                          placeholder="Filter by caption..."
+                          className="max-w-sm"
+                          value={titleFilter}
+                          onChange={(e) => setTitleFilter(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <Label
+                          htmlFor="date-filter"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Filter by date
+                        </Label>
+                        <Input
+                          id="date-filter"
+                          name="date-filter"
+                          type="date"
+                          className="max-w-sm"
+                          value={dateFilter}
+                          onChange={(e) => setDateFilter(e.target.value)}
+                        />
+                      </div>
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -603,15 +690,32 @@ export default function ProfilePage({
 
                         // Upload to Supabase storage
                         try {
+                          console.log("📤 Uploading avatar...");
                           const { url, error } = await uploadAvatar(file);
                           if (error) {
-                            console.error("Error uploading avatar:", error);
+                            console.error("❌ Error uploading avatar:", error);
                             // You could show an error toast here
                           } else if (url) {
+                            console.log(
+                              "✅ Avatar uploaded successfully:",
+                              url
+                            );
                             handleProfileInputChange("avatarUrl", url);
+                            // Update profileUser state immediately since uploadAvatar already updated the database
+                            if (isOwnProfile) {
+                              console.log(
+                                "🔄 Updating profileUser with new avatar"
+                              );
+                              setProfileUser((prev) =>
+                                prev ? { ...prev, avatarUrl: url } : null
+                              );
+                            }
                           }
                         } catch (error) {
-                          console.error("Error uploading avatar:", error);
+                          console.error(
+                            "❌ Exception uploading avatar:",
+                            error
+                          );
                         }
                       }
                     }}
@@ -622,6 +726,7 @@ export default function ProfilePage({
                 <Label htmlFor="bio">Bio</Label>
                 <Textarea
                   id="bio"
+                  autoComplete="off"
                   value={editedProfile.bio || ""}
                   onChange={(e) =>
                     handleProfileInputChange("bio", e.target.value)
@@ -666,6 +771,8 @@ export default function ProfilePage({
                 </div>
                 <Input
                   id="website"
+                  type="url"
+                  autoComplete="url"
                   value={editedProfile.contacts?.website?.value || ""}
                   onChange={(e) =>
                     handleContactChange("website", "value", e.target.value)
@@ -694,6 +801,8 @@ export default function ProfilePage({
                 </div>
                 <Input
                   id="phone"
+                  type="tel"
+                  autoComplete="tel"
                   value={editedProfile.contacts?.phone?.value || ""}
                   onChange={(e) =>
                     handleContactChange("phone", "value", e.target.value)
@@ -723,6 +832,8 @@ export default function ProfilePage({
                 <div className="flex gap-2">
                   <Input
                     id="messaging-platform"
+                    type="text"
+                    autoComplete="off"
                     value={editedProfile.contacts?.messaging?.platform || ""}
                     onChange={(e) =>
                       handleContactChange(
@@ -735,6 +846,8 @@ export default function ProfilePage({
                   />
                   <Input
                     id="messaging-username"
+                    type="text"
+                    autoComplete="off"
                     value={editedProfile.contacts?.messaging?.username || ""}
                     onChange={(e) =>
                       handleContactChange(
